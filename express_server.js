@@ -15,11 +15,11 @@ app.post("/urls", (req, res) => {
   let longUrl = ""; 
   longUrl += generateRandomString()
   urlDatabase[longUrl] = req.body.longURL; // Log the POST request body to the console
-  res.redirect(`/u/${longUrl}`); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/u/${longUrl}`); 
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 app.get("/urls", (req, res) => {
