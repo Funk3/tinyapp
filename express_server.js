@@ -11,6 +11,12 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+app.post("/urls/:id/delete", (req, res) => {
+  const name = req.params.id;
+  delete urlDatabase[name];
+  res.redirect('/urls')
+});
+
 app.post("/urls", (req, res) => {
   let longUrl = ""; 
   longUrl += generateRandomString()
