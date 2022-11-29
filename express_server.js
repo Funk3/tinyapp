@@ -15,7 +15,7 @@ app.post("/urls", (req, res) => {
   let longUrl = ""; 
   longUrl += generateRandomString()
   urlDatabase[longUrl] = req.body.longURL; // Log the POST request body to the console
-  res.redirect(`/u/:${longUrl}`); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/u/${longUrl}`); // Respond with 'Ok' (we will replace this)
 });
 
 app.get("/", (req, res) => {
@@ -32,7 +32,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: href="#"}
+  const templateVars = { id: req.params.id, longURL: href=`#`}
   res.render("urls_show", templateVars);
 });
 
