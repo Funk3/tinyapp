@@ -19,6 +19,10 @@
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
+        <form method="POST" action="/urls/<%= id %>/submit">
+          <label for="newURL">New URL:</label>
+          <input id="id" type="text" name="longURL" value="<%= longURL %>" />
+          <button type ="submit">Submit</button></form>
       </div>
       <div class="card-footer text-muted"></div>
     </div>
