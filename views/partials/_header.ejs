@@ -17,8 +17,7 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <% if (!user){ %>
-          <a class="nav-item nav-link"><form method="POST" action="/login">
-            <input id="id" type="text" name="username" value="" />
+          <a class="nav-item nav-link"><form method="GET" action="/login">
             <button type ="submit">Sign In</button>
           </form>
           <% } else{ %>

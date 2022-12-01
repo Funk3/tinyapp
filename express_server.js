@@ -45,6 +45,14 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   let userID = userKey(req.body.email);
+  let email = req.body.email
+  let password = req.body.password
+  if (emailFind(email) !== email){
+     return res.sendStatus(403)
+  }
+  if (passwordFind(email) !== password){
+    return res.sendStatus(403)
+  } 
   res.cookie("user_id", userID)
   res.redirect('/urls')
 });
@@ -106,6 +114,14 @@ app.get("/register", (req, res) => {
   res.render("urls_register", templateVars)
 });
 
+app.get("/login", (req, res) => {
+  const id = req.params.id
+  let userID = req.cookies["user_id"]
+  const user = users[userID]
+  const templateVars = {user: user,  id: id, longURL: urlDatabase[id]}
+  res.render('login', templateVars)
+});
+
 app.get("/urls.json", (req, res) => {
   res.json(users);
 });
@@ -139,6 +155,14 @@ function emailFind(email) {
   for (let key in users) {
     if (users[key].email === email) {
       return users[key].email
+    }
+  }
+}
+
+function passwordFind(email) {
+  for (let key in users) {
+    if (users[key].email === email) {
+      return users[key].password
     }
   }
 }
