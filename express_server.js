@@ -77,6 +77,10 @@ app.post("/urls", (req, res) => {
   let longUrl = ""; 
   longUrl += generateRandomString()
   urlDatabase[longUrl] = req.body.longURL; // Log the POST request body to the console
+  let id = req.cookies["user_id"]
+  if (!id) {
+    res.send("You cannot make a longUrl unless you are logged in")
+  }
   res.redirect(`/u/${longUrl}`); 
 });
 
@@ -95,6 +99,9 @@ app.get("/urls/new", (req, res) => {
   let id = req.cookies["user_id"]
   const user = users[id]
   const templateVars = {user: user}
+  if(!id){
+    res.render("login", templateVars)
+  }
   res.render("urls_new", templateVars)
 });
 
@@ -103,6 +110,9 @@ app.get("/u/:id", (req, res) => {
   let userID = req.cookies["user_id"]
   const user = users[userID]
   const templateVars = {user: user,  id: id, longURL: urlDatabase[id]}
+  if (!urlDatabase[id]) {
+    res.send("That id does not exist")
+  }
   res.render("urls_show", templateVars);
 });
 
@@ -111,7 +121,10 @@ app.get("/register", (req, res) => {
   let userID = req.cookies["user_id"]
   const user = users[userID]
   const templateVars = {user: user,  id: id, longURL: urlDatabase[id]}
-  res.render("urls_register", templateVars)
+  if(!userID){
+    res.render("urls_register", templateVars)
+  }
+  res.redirect('/urls')
 });
 
 app.get("/login", (req, res) => {
@@ -119,7 +132,10 @@ app.get("/login", (req, res) => {
   let userID = req.cookies["user_id"]
   const user = users[userID]
   const templateVars = {user: user,  id: id, longURL: urlDatabase[id]}
-  res.render('login', templateVars)
+  if(!userID){
+    res.render('login', templateVars)
+  }
+  res.redirect('/urls')
 });
 
 app.get("/urls.json", (req, res) => {
