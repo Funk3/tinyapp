@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs")
+const {userKey, emailFind, urlsForUser, generateRandomString} = require("./helpers")
 
 const app = express();
 const PORT = 8080; // default port 8080
@@ -192,43 +193,4 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-
-function generateRandomString() {
-  let result      = '';
-  const char      = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwyxz1234567890";
-  const length    = char.length;
-
-  for (i = 0; i < 6; i++) {
-    result += char.charAt(Math.floor(Math.random() * length));
-  }
-  
-  return result;
-}
-
-const userKey = (email) => {
-  for (let key in users) {
-    if (users[key].email === email) {
-      return users[key].id;
-    }
-  }
-}
-
-
-const emailFind = (email) => {
-  for (let key in users) {
-    if (users[key].email === email) {
-      return users[key].email;
-    }
-  }
-}
-
-const urlsForUser = (id) => {
-  let userURL = {};
-  for (let url in urlDatabase) {
-    if (id === urlDatabase[url].userID) {
-      userURL[url] = { longURL: urlDatabase[url].longURL, userID: id };
-    }
-  }
-  return userURL;
-};
 
