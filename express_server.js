@@ -74,7 +74,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   req.session = null;
-  res.redirect("/");
+  res.redirect("/login");
 });
 
 app.post("/urls/:id/delete", (req, res) => {
