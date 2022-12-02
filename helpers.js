@@ -1,3 +1,12 @@
+const getUserByEmail = (email, database) => {
+for (let key in database){
+  if (database[key].email === email){
+    return database[key].id;
+  }
+  
+}
+}
+
 const userKey = (email) => {
   for (let key in users) {
     if (users[key].email === email) {
@@ -36,4 +45,4 @@ function generateRandomString() {
   return result;
 }
 
-module.exports = {userKey, emailFind, urlsForUser, generateRandomString}
+module.exports = {userKey, emailFind, urlsForUser, generateRandomString, getUserByEmail}
