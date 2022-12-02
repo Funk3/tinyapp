@@ -1,11 +1,13 @@
 const express = require("express");
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
+const bcrypt = require("bcryptjs")
+
 const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
-app.use(cookieParser());
+app.use(cookieSession());
 app.use(express.urlencoded({ extended: true }));
 
 const urlDatabase = {
@@ -37,6 +39,7 @@ app.post("/register", (req, res) => {
   id += generateRandomString();
   let email = req.body.email;
   let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password);
   if (email === "" || password === "") {
     res.sendStatus(400);
   }
@@ -44,8 +47,8 @@ app.post("/register", (req, res) => {
   if (foundEmail === req.body.email) {
     res.sendStatus(400);
   }
-  res.cookie("user_id", id);
-  users[id] = {id, email, password};
+  req.session.user_id = id;
+  users[id] = {id, email, hashedPassword};
   res.redirect("/urls");
 });
 
@@ -53,23 +56,24 @@ app.post("/login", (req, res) => {
   let userID = userKey(req.body.email);
   let email = req.body.email;
   let password = req.body.password;
+  let userPassword = users[userID].hashedPassword 
   if (emailFind(email) !== email) {
     return res.sendStatus(403);
   }
-  if (passwordFind(email) !== password) {
+  if (bcrypt.compareSync(password, userPassword) === false) {
     return res.sendStatus(403);
   }
-  res.cookie("user_id", userID);
+  req.session.user_id = userID;
   res.redirect('/urls');
 });
 
 app.post("/logout", (req, res) => {
   res.clearCookie("user_id");
-  res.redirect("/urls");
+  res.redirect("/");
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
   const id     = req.params.id;
   if (!cookie) {
     res.sendStatus(403)
@@ -82,7 +86,7 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls/:id/submit", (req, res) => {
-  const cookie = req.cookies["user_id"];
+  const cookie = req.session.user_id;
   const id     = req.params.id;
   if (!cookie) {
     res.sendStatus(403)
@@ -95,7 +99,7 @@ app.post("/urls/:id/submit", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let user = req.cookies["user_id"];
+  let user = req.session.user_id;
   if (!user) {
     res.send("You cannot make a longUrl unless you are logged in");
   }
@@ -105,7 +109,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  let cookie = req.cookies["user_id"]
+  let cookie = req.session.user_id;
   if (cookie === undefined) {
     res.redirect("/login")
   } else {
@@ -114,7 +118,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let id = req.cookies["user_id"];
+  let id = req.session.user_id;
   const user = users[id];
   const templateVars = { user: user, urls: urlsForUser(id)};
   if (id === undefined) {
@@ -124,7 +128,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let id = req.cookies["user_id"];
+  let id = req.session.user_id;
   const user = users[id];
   const templateVars = {user: user};
   if (!id) {
@@ -141,7 +145,7 @@ app.get("/u/:id", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   const user = users[userID];
   const templateVars = {user: user,  id: id, urls: urlDatabase};
   if (userID === undefined){
@@ -158,7 +162,7 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/register", (req, res) => {
   const id = req.params.id;
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   const user = users[userID];
   const templateVars = {user: user, id: id, url: urlDatabase};
   if (!userID) {
@@ -171,7 +175,7 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   const id = req.params.id;
-  let userID = req.cookies["user_id"];
+  let userID = req.session.user_id;
   const user = users[userID];
   const templateVars = {user: user, id: id, url: urlDatabase};
   res.render('login', templateVars);
