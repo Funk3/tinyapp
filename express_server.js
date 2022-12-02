@@ -21,6 +21,7 @@ const urlDatabase = {
     userID: "aJ48lW",
   }
 };
+
 const users = {
   aJ48lW: {
     id: "aJ48lW",
@@ -28,8 +29,6 @@ const users = {
     password: "123",
   }
 };
-
-const foundEmail = emailFind(email, users)
 
 //
 //POST
@@ -42,6 +41,7 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password);
+  const foundEmail = emailFind(email, users);
   
   if (email === "" || password === "") {
     res.sendStatus(400);
@@ -59,6 +59,7 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const userID = userKey(req.body.email, users);
   const userPassword = users[userID].hashedPassword;
+  const foundEmail = emailFind(email, users);
 
   if (foundEmail !== email) {
     return res.sendStatus(403);
@@ -115,7 +116,7 @@ app.post("/urls", (req, res) => {
   };
 
   urlDatabase[shortURL] = {longURL: req.body.longURL, userID: user};
-  res.redirect(`/urls/${shortURLstring}`);
+  res.redirect(`/urls/${shortURL}`);
 });
 
 //
@@ -157,9 +158,9 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
   const id = req.params.id
-  const longURL = urlDatabase[id].longURL
+  const URL = urlDatabase[id].longURL
 
-  res.redirect(longURL)
+  res.redirect(`${URL}`)
 })
 
 app.get("/urls/:id", (req, res) => {
@@ -204,12 +205,10 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/urls.json", (req, res) => {
-
   res.json(users);
 });
 
 app.listen(PORT, () => {
-  
   console.log(`Example app listening on port ${PORT}!`);
 });
 
