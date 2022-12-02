@@ -7,7 +7,10 @@ const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
-app.use(cookieSession());
+app.use(cookieSession({
+  name: 'session',
+  keys: ["key1", "key2"]
+}));
 app.use(express.urlencoded({ extended: true }));
 
 const urlDatabase = {
@@ -37,6 +40,7 @@ const users = {
 app.post("/register", (req, res) => {
   let id = "";
   id += generateRandomString();
+  req.session.user_id = id;
   let email = req.body.email;
   let password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password);
@@ -47,7 +51,6 @@ app.post("/register", (req, res) => {
   if (foundEmail === req.body.email) {
     res.sendStatus(400);
   }
-  req.session.user_id = id;
   users[id] = {id, email, hashedPassword};
   res.redirect("/urls");
 });
@@ -68,7 +71,7 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id");
+  req.session = null;
   res.redirect("/");
 });
 
@@ -202,7 +205,7 @@ function generateRandomString() {
   return result;
 }
 
-function userKey(email) {
+const userKey = (email) => {
   for (let key in users) {
     if (users[key].email === email) {
       return users[key].id;
@@ -210,7 +213,8 @@ function userKey(email) {
   }
 }
 
-function emailFind(email) {
+
+const emailFind = (email) => {
   for (let key in users) {
     if (users[key].email === email) {
       return users[key].email;
@@ -218,15 +222,7 @@ function emailFind(email) {
   }
 }
 
-function passwordFind(email) {
-  for (let key in users) {
-    if (users[key].email === email) {
-      return users[key].password;
-    }
-  }
-}
-
-const urlsForUser = function(id) {
+const urlsForUser = (id) => {
   let userURL = {};
   for (let url in urlDatabase) {
     if (id === urlDatabase[url].userID) {
